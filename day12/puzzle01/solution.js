@@ -9,23 +9,23 @@ else
     increment area counter variable
     check adjacent tiles
         if same letter, recurse there
-        else, increment perimeter counter 
+        else, increment perimeter counter
 */
 
 import { promises as fs } from "fs";
 
 const solution = async () => {
-  const data = await fs.readFile("./input2.txt", "utf8");
+  const data = await fs.readFile("./input.txt", "utf8");
   let dataArray = data.split(/\r\n|\r|\n/);
   let visitedTiles = {};
   let totalCost = 0;
 
-  const recurse = (currentPlant, i, j, memo = { area: 0, perimeter: 0 }) => {
-    if (currentPlant === "B") {
-      console.log(memo.area, i, j);
-    }
+  const recurse = (currentPlant, i, j) => {
+    let totalArea = 0;
+    let totalPerimeter = 0;
+    // first, mark the current tile as having been visited:
     visitedTiles[`${i}.${j}`] = true;
-    memo.area += 1;
+    // next, compute coords for adjacent tiles and determine whether any of them need to be traversed:
     let left = [i, j - 1];
     let right = [i, j + 1];
     let up = [i - 1, j];
@@ -33,30 +33,36 @@ const solution = async () => {
     let adjacentCoords = [left, right, up, down];
     let validAdjacents = [];
     adjacentCoords.forEach((coords) => {
-      if (visitedTiles[`${coords[0]}.${coords[1]}`]) {
-        return;
-      }
       const inBounds = coords.every(
         (coord) => coord >= 0 && coord < dataArray.length
       );
       if (!inBounds) {
-        memo.perimeter += 1;
+        totalPerimeter += 1;
         return;
       }
       if (dataArray[coords[0]][coords[1]] !== currentPlant) {
-        memo.perimeter += 1;
+        totalPerimeter += 1;
         return;
       }
       validAdjacents.push(coords);
     });
-    currentPlant === "B" ? console.log(memo.area, validAdjacents) : null;
+
+    // base case
     if (validAdjacents.length === 0) {
-      return memo;
+      return { area: 1, perimeter: totalPerimeter };
     }
+    // if not base case
+    totalArea += 1;
     validAdjacents.forEach((coords) => {
-      recurse(currentPlant, coords[0], coords[1], memo);
+      // skip this coord if we've been there already
+      if (visitedTiles[`${coords[0]}.${coords[1]}`]) {
+        return;
+      }
+      let { area, perimeter } = recurse(currentPlant, coords[0], coords[1]);
+      totalArea += area;
+      totalPerimeter += perimeter;
     });
-    return memo;
+    return { area: totalArea, perimeter: totalPerimeter };
   };
 
   dataArray.forEach((line, i) => {
