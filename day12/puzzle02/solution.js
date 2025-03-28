@@ -111,14 +111,13 @@ const solution = async () => {
       }
       let { area, sides, sideMap } = recurse(line[j], i, j);
       for (const key in sideMap) {
-        sideMap[key].sort();
+        sideMap[key].sort((a, b) => a - b);
         sideMap[key].forEach((element, i) => {
           if (element - sideMap[key][i - 1] > 1) {
             sides++;
           }
         });
       }
-      console.log(area, sides, sideMap);
       totalCost += area * sides;
     }
   });
