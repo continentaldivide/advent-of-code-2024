@@ -38,38 +38,24 @@ const solution = async () => {
 
   let symmetricalFrames = [];
 
-  // iterate over all possible frames; evaluate num of robots in each quad; evaluate diff of left-side count/right-side count; produce an image of any frame where diff = 0
+  // iterate over all possible frames; in each frame count number of robots in a diagonal line; produce an image of any frame where at least 100 robots in a diagonal
   for (let i = 0; i < width * height; i++) {
     let output = generateOutput(i);
-
-    let [bottomRightCount, bottomLeftCount, topRightCount, topLeftCount] = [
-      0, 0, 0, 0,
-    ];
-    output.forEach((robot) => {
-      const [x, y] = robot;
-      let midCol = Math.floor(width / 2);
-      let midRow = Math.floor(height / 2);
-      if (x === midCol || y === midRow) {
-        return;
-      }
-      if (x > midCol && y > midRow) {
-        bottomRightCount++;
-      }
-      if (x < midCol && y > midRow) {
-        bottomLeftCount++;
-      }
-      if (x > midCol && y < midRow) {
-        topRightCount++;
-      }
-      if (x < midCol && y < midRow) {
-        topLeftCount++;
-      }
+    let inDiagonal = 0;
+    let outputMap = {};
+    output.forEach((e) => {
+      outputMap[`${e[0]}.${e[1]}`] = true;
     });
-    let diff = Math.abs(
-      topLeftCount + bottomLeftCount - (topRightCount + bottomRightCount)
-    );
-    // either I have a bug, or diff === 0 is too strict
-    if (diff === 0) {
+    for (let j = 0; j < output.length; j++) {
+      const [x, y] = output[j];
+
+      const downRightRobotExists = outputMap[`${x + 1}.${y + 1}`];
+      const upLeftRobotExists = outputMap[`${x - 1}.${y - 1}`];
+      if (downRightRobotExists && upLeftRobotExists) {
+        inDiagonal++;
+      }
+    }
+    if (inDiagonal > 100) {
       symmetricalFrames.push(i);
 
       const grid = Array.from({ length: height }, () => {
