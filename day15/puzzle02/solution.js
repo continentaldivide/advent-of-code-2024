@@ -56,6 +56,7 @@ const solution = async () => {
     let [deltaX, deltaY] = dirMap[direction];
     let [x, y] = [robotCoords[0] + deltaX, robotCoords[1] + deltaY];
     let adjacentTile = warehouseMapArray[y][x];
+    // we're going to modify x and y later but we'll still need adjacent coords
     let adjacentCoords = [x, y];
     // if we find a wall, return
     if (adjacentTile === "#") {
@@ -77,7 +78,6 @@ const solution = async () => {
       let distance = 0;
       while (nextOpenTile === "[" || nextOpenTile === "]") {
         x += deltaX;
-        y += deltaY;
         distance++;
         nextOpenTile = warehouseMapArray[y][x];
       }
@@ -105,7 +105,12 @@ const solution = async () => {
       }
     }
     // now handle if dir is up or down
-    else {
+    if (!horizontalMove) {
+      // iterate to discover whether chain of boxes is moveable
+      // along the way, capture coords of each [ and ] in chain
+      // if chain is moveable, replace all [ and ] with .
+      // redraw all [ and ] in new positions
+      // replace robot with ., update robot coords, replace adj tile with @
     }
   };
 
